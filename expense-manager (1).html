@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ankit Expense Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0f0e0d;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #c9a84c;
+    --gold-light: #f0d98a;
+    --rust: #c0392b;
+    --forest: #2d6a4f;
+    --slate: #4a5568;
+    --muted: #8a8070;
+    --border: #d4c9b0;
+    --shadow: rgba(15,14,13,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(45,106,79,0.06) 0%, transparent 60%);
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 28px 48px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+    display: grid;
+    gap: 40px;
+  }
+
+  /* ── SECTION LABELS ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FORM CARD ── */
+  .form-card {
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    padding: 36px 40px;
+    box-shadow: 4px 4px 0 var(--ink);
+    position: relative;
+  }
+  .form-card::before {
+    content: '₹';
+    position: absolute;
+    top: -18px;
+    right: 32px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  /* ── FORM GRID ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 28px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  /* ── FIELD ── */
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 7px;
+  }
+  .field select,
+  .field input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5568' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .field select:focus,
+  .field input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  }
+  .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  /* ── TYPE TOGGLE ── */
+  .type-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .type-toggle label {
+    flex: 1;
+    text-align: center;
+    padding: 11px 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+  }
+  .type-toggle input { display: none; }
+  .type-toggle input:checked + label {
+    color: #fff;
+    font-weight: 600;
+  }
+  #toggle-income:checked + label { background: var(--forest); }
+  #toggle-expense:checked + label { background: var(--rust); }
+
+  /* ── SUBMIT BUTTON ── */
+  .submit-btn {
+    margin-top: 28px;
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn:hover {
+    background: #1e1d1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .submit-btn .btn-text { transition: opacity 0.2s; }
+  .submit-btn.loading .btn-text { opacity: 0; }
+  .submit-btn .spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .submit-btn.loading .spinner { opacity: 1; }
+  .spinner-ring {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(245,240,232,0.3);
+    border-top-color: var(--paper);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    padding: 14px 20px;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    max-width: 340px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--forest); }
+  .toast.error { background: var(--rust); }
+
+  /* ── RESULT CARD ── */
+  .result-section { display: none; }
+  .result-section.visible { display: block; }
+
+  .result-card {
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0 var(--ink);
+    animation: slideUp 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .result-header h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+  }
+  .result-header .date-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border: 1px solid rgba(245,240,232,0.3);
+    border-radius: 2px;
+  }
+
+  .result-body {
+    background: #fff;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+
+  .stat-block {
+    padding: 20px 24px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-block:last-child { border-right: none; }
+  .stat-block .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stat-block .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-value.income { color: var(--forest); }
+  .stat-value.expense { color: var(--rust); }
+  .stat-value.balance-pos { color: var(--forest); }
+  .stat-value.balance-neg { color: var(--rust); }
+  .stat-value.balance-zero { color: var(--slate); }
+
+  .stat-detail {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+
+  .status-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .status-pill.surplus { background: rgba(45,106,79,0.1); color: var(--forest); border: 1px solid rgba(45,106,79,0.3); }
+  .status-pill.deficit { background: rgba(192,57,43,0.1); color: var(--rust); border: 1px solid rgba(192,57,43,0.3); }
+  .status-pill.break-even { background: rgba(74,85,104,0.1); color: var(--slate); border: 1px solid rgba(74,85,104,0.3); }
+
+  .names-row {
+    border-top: 1px solid var(--border);
+    padding: 16px 28px;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  .names-row strong {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header { padding: 20px 20px; }
+    main { padding: 28px 16px 60px; }
+    .form-card { padding: 24px 20px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .result-body { grid-template-columns: 1fr; }
+    .stat-block { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-block:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Expense Manager</h1>
+  <span>Ankit's Ledger</span>
+</header>
+
+<main>
+
+  <!-- FORM SECTION -->
+  <section>
+    <p class="section-label">New Entry</p>
+    <div class="form-card">
+      <form id="expenseForm">
+
+        <!-- Type Toggle -->
+        <div class="field full" style="margin-bottom:20px">
+          <label>Type of Transaction</label>
+          <div class="type-toggle">
+            <input type="radio" name="type_of_transaction" id="toggle-income" value="Income" checked>
+            <label for="toggle-income">↑ Income</label>
+            <input type="radio" name="type_of_transaction" id="toggle-expense" value="Expense">
+            <label for="toggle-expense">↓ Expense</label>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Category -->
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="">— Select —</option>
+              <option value="Factory">Factory</option>
+              <option value="Home">Home</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Name -->
+          <div class="field">
+            <label for="name">Name</label>
+            <select id="name" name="name" required>
+              <option value="">— Select —</option>
+              <option value="Dharmender">Dharmender</option>
+              <option value="Virender">Virender</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Amount -->
+          <div class="field">
+            <label for="amount">Amount (₹)</label>
+            <input type="number" id="amount" name="amount" placeholder="0" min="1" required />
+          </div>
+
+          <!-- Description -->
+          <div class="field">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" placeholder="Optional note" />
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-text">Submit Entry</span>
+          <span class="spinner"><span class="spinner-ring"></span></span>
+        </button>
+
+      </form>
+    </div>
+  </section>
+
+  <!-- RESULT SECTION -->
+  <section class="result-section" id="resultSection">
+    <p class="section-label">Today's Summary</p>
+    <div class="result-card" id="resultCard">
+      <div class="result-header">
+        <h3 id="resName">—</h3>
+        <span class="date-badge" id="resDate">—</span>
+      </div>
+      <div class="result-body">
+        <div class="stat-block">
+          <div class="stat-label">Total Income</div>
+          <div class="stat-value income" id="resIncome">₹0</div>
+          <div class="stat-detail" id="resIncomeDetail">—</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Total Expenditure</div>
+          <div class="stat-value expense" id="resExpense">₹0</div>
+          <div class="stat-detail" id="resExpenseDetail">—</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Balance</div>
+          <div class="stat-value" id="resBalance">₹0</div>
+          <span class="status-pill" id="resStatus">—</span>
+        </div>
+      </div>
+      <div class="names-row">
+        <strong>People:</strong>
+        <span id="resPeople">—</span>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const WEBHOOK_URL = 'https://ns83.app.n8n.cloud/webhook/expense-manager';
+
+  const form       = document.getElementById('expenseForm');
+  const btn        = document.getElementById('submitBtn');
+  const toast      = document.getElementById('toast');
+  const resultSec  = document.getElementById('resultSection');
+
+  function showToast(msg, type = 'success') {
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.className = 'toast'; }, 4000);
+  }
+
+  function setLoading(on) {
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+  }
+
+  function renderResult(data) {
+    const balVal = parseFloat(data.Balance) || 0;
+    const statusLower = (data.Status || '').toLowerCase().replace('-', '-');
+
+    document.getElementById('resName').textContent    = data.Name || '—';
+    document.getElementById('resDate').textContent    = data.Date || '—';
+    document.getElementById('resIncome').textContent  = '₹' + (parseFloat(data.Total_Income) || 0).toLocaleString('en-IN');
+    document.getElementById('resExpense').textContent = '₹' + (parseFloat(data.Total_Expenditure) || 0).toLocaleString('en-IN');
+    document.getElementById('resIncomeDetail').textContent  = data.Income_Detail || '—';
+    document.getElementById('resExpenseDetail').textContent = data.Expenditure_Detail || '—';
+
+    const balEl = document.getElementById('resBalance');
+    balEl.textContent = '₹' + Math.abs(balVal).toLocaleString('en-IN');
+    balEl.className = 'stat-value ' + (balVal > 0 ? 'balance-pos' : balVal < 0 ? 'balance-neg' : 'balance-zero');
+
+    const pill = document.getElementById('resStatus');
+    pill.textContent = data.Status || '—';
+    pill.className = 'status-pill ' + statusLower.replace(' ', '-');
+
+    document.getElementById('resPeople').textContent = data.Name || '—';
+
+    resultSec.classList.add('visible');
+    resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const fd = new FormData(form);
+    const payload = {
+      type_of_transaction: fd.get('type_of_transaction'),
+      category:   fd.get('category'),
+      name:       fd.get('name'),
+      description: fd.get('description') || '',
+      amount:     parseFloat(fd.get('amount'))
+    };
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      renderResult(data);
+      showToast('Entry saved & summary updated ✓', 'success');
+      form.reset();
+      document.getElementById('toggle-income').checked = true;
+
+    } catch (err) {
+      console.error(err);
+      showToast('Could not reach the webhook. Check CORS or URL.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>
+</body>
+</html>
